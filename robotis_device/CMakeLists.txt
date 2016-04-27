@@ -19,7 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES robotis_device
+  LIBRARIES robotis_device
   CATKIN_DEPENDS roscpp rospy
 #  DEPENDS system_lib
 )
@@ -56,6 +56,5 @@ add_dependencies(robotis_device ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXP
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(robotis_device
-  dynamixel_sdk
   ${catkin_LIBRARIES}
 )
