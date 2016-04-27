@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES dynamixel_sdk
+  LIBRARIES dynamixel_sdk
 #  CATKIN_DEPENDS roscpp
 #  DEPENDS system_lib
 )
