@@ -13,6 +13,10 @@ find_package(catkin REQUIRED COMPONENTS
   dynamixel_sdk
 )
 
+set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${CATKIN_DEVEL_PREFIX}/lib/pkgconfig")
+find_package(PkgConfig)
+pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
+
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -24,7 +28,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES robotis_controller
+  LIBRARIES robotis_controller
   CATKIN_DEPENDS roscpp roslib sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
@@ -39,6 +43,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${yaml_cpp_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -48,8 +53,6 @@ add_library(robotis_controller
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(robotis_controller
-  yaml-cpp
-  robotis_device
-  dynamixel_sdk
+  ${yaml_cpp_LIBRARIES}
   ${catkin_LIBRARIES}
 )
