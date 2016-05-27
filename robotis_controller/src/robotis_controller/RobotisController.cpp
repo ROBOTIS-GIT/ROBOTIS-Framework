@@ -1147,6 +1147,9 @@ void RobotisController::SetCtrlModuleThread(std::string ctrl_module)
         {
             Dynamixel *_dxl = _d_it->second;
             _dxl->ctrl_module_name = "none";
+            
+            if (gazebo_mode)
+              continue;
 
             UINT32_T _pos_data = _dxl->ConvertRadian2Value(_dxl->dxl_state->goal_position + _dxl->dxl_state->position_offset);
             UINT8_T _sync_write_data[4];
@@ -1177,6 +1180,9 @@ void RobotisController::SetCtrlModuleThread(std::string ctrl_module)
                     {
                         Dynamixel *_dxl = _d_it->second;
                         _dxl->ctrl_module_name = ctrl_module;
+                        
+                        if (gazebo_mode)
+                          continue;
 
                         if(_mode == POSITION_CONTROL)
                         {
