@@ -33,7 +33,7 @@ position_p_gain_item_name       = position_p_gain
    11  | max_temperature_limit    | 1      | RW     | EEPROM | 0             | 99          | N
    12  | min_voltage_limit        | 1      | RW     | EEPROM | 0             | 250         | N
    13  | max_voltage_limit        | 1      | RW     | EEPROM | 0             | 250         | N
-   14  | max_torque               | 2      | RW     | EEPROM | 0             | 1023        | N
+   14  | torque_limit             | 2      | RW     | EEPROM | 0             | 1023        | N
    16  | status_return_level      | 1      | RW     | EEPROM | 0             | 2           | N
    17  | alarm_LED                | 1      | RW     | EEPROM | 0             | 127         | N
    18  | alarm_shutdown           | 1      | RW     | EEPROM | 0             | 127         | N
@@ -47,7 +47,7 @@ position_p_gain_item_name       = position_p_gain
    30  | goal_position            | 2      | RW     | RAM    | -28672        | 28672       | Y
    32  | goal_velocity            | 2      | RW     | RAM    | 0             | 1023        | N
    34  | goal_torque              | 2      | RW     | RAM    | 0             | 1023        | N
-   36  | present_position         | 2      | R      | RAM    | 0             | 4095        | N
+   36  | present_position         | 2      | R      | RAM    | -28672        | 28672       | Y
    38  | present_velocity         | 2      | R      | RAM    | 0             | 2048        | N
    40  | present_load             | 2      | R      | RAM    | 0             | 2048        | N
    42  | present_voltage          | 1      | R      | RAM    | 50            | 250         | N
