@@ -382,7 +382,7 @@ void RobotisController::InitDevice(const std::string init_file_path)
 
             if(_dxl == NULL)
             {
-                ROS_WARN("Joint [%s] does not found.", _joint_name.c_str());
+                ROS_WARN("Joint [%s] was not found.", _joint_name.c_str());
                 continue;
             }
             if(DEBUG_PRINT) ROS_INFO("JOINT_NAME: %s", _joint_name.c_str());
@@ -398,7 +398,7 @@ void RobotisController::InitDevice(const std::string init_file_path)
                 ControlTableItem *_item = _dxl->ctrl_table[_item_name];
                 if(_item == NULL)
                 {
-                    ROS_WARN("Control Item [%s] does not found.", _item_name.c_str());
+                    ROS_WARN("Control Item [%s] was not found.", _item_name.c_str());
                     continue;
                 }
 
