@@ -1,0 +1,62 @@
+[device info]
+model_name  = MX-106
+device_type = dynamixel
+
+[type info]
+value_of_0_radian_position      = 2048
+value_of_min_radian_position    = 0
+value_of_max_radian_position    = 4095
+min_radian                      = -3.14159265
+max_radian                      =  3.14159265
+
+torque_enable_item_name         = torque_enable
+present_position_item_name      = present_position
+present_velocity_item_name      = present_velocity
+present_current_item_name       = 
+goal_position_item_name         = goal_position
+goal_velocity_item_name         = goal_velocity
+goal_current_item_name          = 
+position_d_gain_item_name       = position_d_gain
+position_i_gain_item_name       = position_i_gain
+position_p_gain_item_name       = position_p_gain
+
+[control table]
+# addr | item name                | length | access | memory |   min value   |  max value  | signed
+   0   | model_number             | 2      | R      | EEPROM | 0             | 65535       | N
+   2   | version_of_firmware      | 1      | R      | EEPROM | 0             | 254         | N
+   3   | ID                       | 1      | RW     | EEPROM | 0             | 252         | N
+   4   | baudrate                 | 1      | RW     | EEPROM | 0             | 252         | N
+   5   | return_delay_time        | 1      | RW     | EEPROM | 0             | 254         | N
+   6   | CW_angle_limit           | 2      | RW     | EEPROM | 0             | 4095        | N
+   8   | CCW_angle_limit          | 2      | RW     | EEPROM | 0             | 4095        | N
+   10  | drive_mode               | 1      | RW     | EEPROM | 0             | 3           | N
+   11  | max_temperature_limit    | 1      | RW     | EEPROM | 0             | 99          | N
+   12  | min_voltage_limit        | 1      | RW     | EEPROM | 0             | 250         | N
+   13  | max_voltage_limit        | 1      | RW     | EEPROM | 0             | 250         | N
+   14  | max_torque               | 2      | RW     | EEPROM | 0             | 1023        | N
+   16  | status_return_level      | 1      | RW     | EEPROM | 0             | 2           | N
+   17  | alarm_LED                | 1      | RW     | EEPROM | 0             | 127         | N
+   18  | alarm_shutdown           | 1      | RW     | EEPROM | 0             | 127         | N
+   20  | multi_turn_offset        | 2      | RW     | EEPROM | -26624        | 26624       | Y
+   22  | resolution_dividor       | 1      | RW     | EEPROM | 1             | 255         | N
+   24  | torque_enable            | 1      | RW     | RAM    | 0             | 1           | N
+   25  | LED                      | 1      | RW     | RAM    | 0             | 1           | N
+   26  | position_d_gain          | 1      | RW     | RAM    | 0             | 254         | N
+   27  | position_i_gain          | 1      | RW     | RAM    | 0             | 254         | N
+   28  | position_p_gain          | 1      | RW     | RAM    | 0             | 254         | N
+   30  | goal_position            | 2      | RW     | RAM    | -28672        | 28672       | Y
+   32  | goal_velocity            | 2      | RW     | RAM    | 0             | 1023        | N
+   34  | goal_torque              | 2      | RW     | RAM    | 0             | 1023        | N
+   36  | present_position         | 2      | R      | RAM    | 0             | 4095        | N
+   38  | present_velocity         | 2      | R      | RAM    | 0             | 2048        | N
+   40  | present_load             | 2      | R      | RAM    | 0             | 2048        | N
+   42  | present_voltage          | 1      | R      | RAM    | 50            | 250         | N
+   43  | present_temperature      | 1      | R      | RAM    | 0             | 99          | N
+   44  | registered_instruction   | 1      | R      | RAM    | 0             | 1           | N
+   46  | is_moving                | 1      | R      | RAM    | 0             | 1           | N
+   47  | EEPROM_lock              | 1      | RW     | RAM    | 0             | 1           | N
+   48  | punch                    | 2      | RW     | RAM    | 0             | 1023        | N
+   68  | current_consumed         | 2      | RW     | RAM    | 0             | 1023        | N
+   70  | torque_control_mode      | 1      | RW     | RAM    | 0             | 1023        | N
+   71  | torque_control_goal      | 2      | RW     | RAM    | 0             | 1023        | N
+   73  | goal_acceleration        | 1      | RW     | RAM    | 0             | 254         | N
