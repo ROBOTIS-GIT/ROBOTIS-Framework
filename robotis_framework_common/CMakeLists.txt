@@ -9,6 +9,7 @@ project(robotis_framework_common)
 ################################################################################
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  robotis_device
 )
 
 ################################################################################
@@ -24,14 +25,26 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################################################
 catkin_package(
   INCLUDE_DIRS include
+  LIBRARIES robotis_framework_common
+  CATKIN_DEPENDS roscpp robotis_device
 )
 
 ################################################################################
 # Build
 ################################################################################
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
+
+set(HEADERS
+  include/${PROJECT_NAME}/motion_module.h
+  include/${PROJECT_NAME}/sensor_module.h
+  include/${PROJECT_NAME}/singleton.h
+)
+
+add_library(${PROJECT_NAME} ${HEADERS})
+set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 ################################################################################
 # Install
