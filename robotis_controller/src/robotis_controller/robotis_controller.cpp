@@ -199,8 +199,14 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
   std::string dev_desc_dir_path = ros::package::getPath("robotis_device") + "/devices";
 
   // load robot info : port , device
-  robot_ = new Robot(robot_file_path, dev_desc_dir_path);
+  Robot *new_robot = new Robot(robot_file_path, dev_desc_dir_path);
+  initialize(new_robot, init_file_path);
+}
 
+
+bool RobotisController::initialize(Robot *robot, const std::string init_file_path)
+{
+  robot_ = robot;
   if (gazebo_mode_ == true)
   {
     queue_thread_ = boost::thread(boost::bind(&RobotisController::msgQueueThread, this));
