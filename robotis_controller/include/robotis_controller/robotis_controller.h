@@ -117,6 +117,7 @@ public:
   RobotisController();
 
   bool    initialize(const std::string robot_file_path, const std::string init_file_path);
+  bool    initialize(Robot *robot, const std::string init_file_path);
   void    initializeDevice(const std::string init_file_path);
   void    process();
 
