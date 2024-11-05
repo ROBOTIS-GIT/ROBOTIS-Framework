@@ -41,4 +41,7 @@ install(DIRECTORY devices
 )
 
 ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(rclcpp dynamixel_sdk)
+
 ament_package()

@@ -56,4 +56,16 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(
+  ament_index_cpp
+  rclcpp
+  std_msgs
+  sensor_msgs
+  robotis_controller_msgs
+  dynamixel_sdk
+  robotis_device
+  robotis_framework_common
+)
+
 ament_package()
