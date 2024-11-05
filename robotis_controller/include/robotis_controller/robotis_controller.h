@@ -25,21 +25,22 @@
 #define ROBOTIS_CONTROLLER_ROBOTIS_CONTROLLER_H_
 
 
-#include <ros/ros.h>
-#include <boost/thread.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <thread>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <yaml-cpp/yaml.h>
-#include <std_msgs/Bool.h>
-#include <std_msgs/String.h>
-#include <std_msgs/Float64.h>
-#include <sensor_msgs/JointState.h>
+#include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/string.hpp>
+#include <std_msgs/msg/float64.hpp>
+#include <sensor_msgs/msg/joint_state.hpp>
 
-#include "robotis_controller_msgs/WriteControlTable.h"
-#include "robotis_controller_msgs/SyncWriteItem.h"
-#include "robotis_controller_msgs/JointCtrlModule.h"
-#include "robotis_controller_msgs/GetJointModule.h"
-#include "robotis_controller_msgs/SetJointModule.h"
-#include "robotis_controller_msgs/SetModule.h"
-#include "robotis_controller_msgs/LoadOffset.h"
+#include "robotis_controller_msgs/msg/write_control_table.hpp"
+#include "robotis_controller_msgs/msg/sync_write_item.hpp"
+#include "robotis_controller_msgs/msg/joint_ctrl_module.hpp"
+#include "robotis_controller_msgs/srv/get_joint_module.hpp"
+#include "robotis_controller_msgs/srv/set_joint_module.hpp"
+#include "robotis_controller_msgs/srv/set_module.hpp"
+#include "robotis_controller_msgs/srv/load_offset.hpp"
 
 #include "robotis_device/robot.h"
 #include "robotis_framework_common/motion_module.h"
@@ -56,13 +57,13 @@ enum ControllerMode
   DirectControlMode
 };
 
-class RobotisController : public Singleton<RobotisController>
+class RobotisController : public Singleton<RobotisController>, public rclcpp::Node
 {
 private:
-  boost::thread   queue_thread_;
-  boost::thread   gazebo_thread_;
-  boost::thread   set_module_thread_;
-  boost::mutex    queue_mutex_;
+  std::thread     queue_thread_;
+  std::thread     gazebo_thread_;
+  std::thread     set_module_thread_;
+  std::mutex      queue_mutex_;
 
   bool            init_pose_loaded_;
   bool            is_timer_running_;
@@ -81,7 +82,7 @@ private:
   void gazeboTimerThread();
   void msgQueueThread();
   void setCtrlModuleThread(std::string ctrl_module);
-  void setJointCtrlModuleThread(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
+  void setJointCtrlModuleThread(robotis_controller_msgs::msg::JointCtrlModule::SharedPtr msg);
 
   bool isTimerStopped();
   void initializeSyncWrite();
@@ -109,14 +110,13 @@ public:
   std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_velocity_d_gain_;
 
   /* publisher */
-  ros::Publisher  goal_joint_state_pub_;
-  ros::Publisher  present_joint_state_pub_;
-  ros::Publisher  current_module_pub_;
-
-  std::map<std::string, ros::Publisher> gazebo_joint_position_pub_;
-  std::map<std::string, ros::Publisher> gazebo_joint_velocity_pub_;
-  std::map<std::string, ros::Publisher> gazebo_joint_effort_pub_;
-
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr goal_joint_state_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr present_joint_state_pub_;
+  rclcpp::Publisher<robotis_controller_msgs::msg::JointCtrlModule>::SharedPtr current_module_pub_;
+  
+  std::map<std::string, rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr> gazebo_joint_position_pub_;
+  std::map<std::string, rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr> gazebo_joint_velocity_pub_;
+  std::map<std::string, rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr> gazebo_joint_effort_pub_;
   static void *timerThread(void *param);
 
   RobotisController();
@@ -138,19 +138,19 @@ public:
   void    loadOffset(const std::string path);
 
   /* ROS Topic Callback Functions */
-  void    writeControlTableCallback(const robotis_controller_msgs::WriteControlTable::ConstPtr &msg);
-  void    syncWriteItemCallback(const robotis_controller_msgs::SyncWriteItem::ConstPtr &msg);
-  void    setControllerModeCallback(const std_msgs::String::ConstPtr &msg);
-  void    setJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
-  void    setJointCtrlModuleCallback(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
-  void    setCtrlModuleCallback(const std_msgs::String::ConstPtr &msg);
-  void    enableOffsetCallback(const std_msgs::Bool::ConstPtr &msg);
-  bool    getJointCtrlModuleService(robotis_controller_msgs::GetJointModule::Request &req, robotis_controller_msgs::GetJointModule::Response &res);
-  bool    setJointCtrlModuleService(robotis_controller_msgs::SetJointModule::Request &req, robotis_controller_msgs::SetJointModule::Response &res);
-  bool    setCtrlModuleService(robotis_controller_msgs::SetModule::Request &req, robotis_controller_msgs::SetModule::Response &res);
-  bool    loadOffsetService(robotis_controller_msgs::LoadOffset::Request &req, robotis_controller_msgs::LoadOffset::Response &res);
+  void    writeControlTableCallback(const robotis_controller_msgs::msg::WriteControlTable::SharedPtr msg);
+  void    syncWriteItemCallback(const robotis_controller_msgs::msg::SyncWriteItem::SharedPtr msg);
+  void    setControllerModeCallback(const std_msgs::msg::String::SharedPtr msg);
+  void    setJointStatesCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
+  void    setJointCtrlModuleCallback(const robotis_controller_msgs::msg::JointCtrlModule::SharedPtr msg);
+  void    setCtrlModuleCallback(const std_msgs::msg::String::SharedPtr msg);
+  void    enableOffsetCallback(const std_msgs::msg::Bool::SharedPtr msg);
+  bool    getJointCtrlModuleService(const std::shared_ptr<robotis_controller_msgs::srv::GetJointModule::Request> req, std::shared_ptr<robotis_controller_msgs::srv::GetJointModule::Response> res);
+  bool    setJointCtrlModuleService(const std::shared_ptr<robotis_controller_msgs::srv::SetJointModule::Request> req, std::shared_ptr<robotis_controller_msgs::srv::SetJointModule::Response> res);
+  bool    setCtrlModuleService(const std::shared_ptr<robotis_controller_msgs::srv::SetModule::Request> req, std::shared_ptr<robotis_controller_msgs::srv::SetModule::Response> res);
+  bool    loadOffsetService(const std::shared_ptr<robotis_controller_msgs::srv::LoadOffset::Request> req, std::shared_ptr<robotis_controller_msgs::srv::LoadOffset::Response> res);
 
-  void    gazeboJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
+  void    gazeboJointStatesCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
 
   int     ping        (const std::string joint_name, uint8_t *error = 0);
   int     ping        (const std::string joint_name, uint16_t* model_number, uint8_t *error = 0);
