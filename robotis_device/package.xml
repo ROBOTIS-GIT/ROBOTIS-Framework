@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>robotis_device</name>
   <version>0.2.9</version>
   <description>
@@ -7,7 +7,7 @@
     This package is used when reading device information with the robot information file
     from the robotis_controller package.
   </description>
-  <license>Apache 2.0</license>
+  <license>Apache-2.0</license>
   <author email="zerom@robotis.com">Zerom</author>
   <author email="kmjung@robotis.com">Kayman</author>
   <author email="sch@robotis.com">SCH</author>
@@ -16,7 +16,10 @@
   <url type="emanual">http://emanual.robotis.com/docs/en/software/robotis_framework_packages/</url>
   <url type="repository">https://github.com/ROBOTIS-GIT/ROBOTIS-Framework</url>
   <url type="bugtracker">https://github.com/ROBOTIS-GIT/ROBOTIS-Framework/issues</url>
-  <buildtool_depend>catkin</buildtool_depend>
-  <depend>roscpp</depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
   <depend>dynamixel_sdk</depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>
