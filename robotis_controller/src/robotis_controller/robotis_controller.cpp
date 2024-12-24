@@ -1820,7 +1820,7 @@ bool RobotisController::setJointCtrlModuleService(const std::shared_ptr<robotis_
   modules.joint_name = req->joint_name;
   modules.module_name = req->module_name;
 
-  std::shared_ptr<robotis_controller_msgs::msg::JointCtrlModule> msg_ptr = std::make_shared<robotis_controller_msgs::msg::JointCtrlModule>(modules);
+  auto msg_ptr = std::make_shared<robotis_controller_msgs::msg::JointCtrlModule>(modules);
 
   if (modules.joint_name.size() != modules.module_name.size())
     return false;
@@ -1837,15 +1837,34 @@ bool RobotisController::setCtrlModuleService(const std::shared_ptr<robotis_contr
                        std::shared_ptr<robotis_controller_msgs::srv::SetModule::Response> res)
 {
   if(set_module_thread_.joinable())
-  set_module_thread_.join();
+    set_module_thread_.join();
 
   std::string _module_name_to_set = req->module_name;
 
-  set_module_thread_ = std::thread(&RobotisController::setCtrlModuleThread, this, _module_name_to_set);
+  try
+  {
+    set_module_thread_ = std::thread(&RobotisController::setCtrlModuleThread, this, _module_name_to_set);
 
-  set_module_thread_.join();
+    // 스레드가 성공적으로 종료될 때까지 대기
+    set_module_thread_.join();
 
-  res->result = true;
+    // 서비스 응답 설정
+    res->result = true;
+    RCLCPP_INFO(this->get_logger(), "Successfully set control module: %s", _module_name_to_set.c_str());
+  }
+  catch (const std::exception &e)
+  {
+    RCLCPP_ERROR(this->get_logger(), "Error while setting control module: %s", e.what());
+    res->result = false;
+    return false;
+  }
+  catch (...)
+  {
+    RCLCPP_ERROR(this->get_logger(), "Unknown error occurred while setting control module.");
+    res->result = false;
+    return false;
+  }
+
   return true;
 }
 
@@ -1865,8 +1884,8 @@ void RobotisController::setJointCtrlModuleThread(robotis_controller_msgs::msg::J
 
   for(unsigned int idx = 0; idx < msg->joint_name.size(); idx++)
   {
-    Dynamixel *_dxl = NULL;
-    auto _dxl_it = robot_->dxls_.find((std::string)(msg->joint_name[idx]));
+    Dynamixel *_dxl = nullptr;
+    auto _dxl_it = robot_->dxls_.find((msg->joint_name[idx]));
     if(_dxl_it != robot_->dxls_.end())
       _dxl = _dxl_it->second;
     else
@@ -1908,10 +1927,10 @@ void RobotisController::setJointCtrlModuleThread(robotis_controller_msgs::msg::J
 
   for(unsigned int idx = 0; idx < msg->joint_name.size(); idx++)
   {
-    std::string ctrl_module = msg->module_name[idx];
-    std::string joint_name = msg->joint_name[idx];
+    const std::string& ctrl_module = msg->module_name[idx];
+    const std::string& joint_name = msg->joint_name[idx];
 
-    Dynamixel *_dxl = NULL;
+    Dynamixel *_dxl = nullptr;
     auto _dxl_it = robot_->dxls_.find(joint_name);
     if(_dxl_it != robot_->dxls_.end())
       _dxl = _dxl_it->second;
@@ -1926,8 +1945,7 @@ void RobotisController::setJointCtrlModuleThread(robotis_controller_msgs::msg::J
       if(gazebo_mode_ == true)
         continue;
 
-      uint32_t _pos_data;
-      _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_ + _dxl->dxl_state_->position_offset_ * offset_ratio_);
+      uint32_t _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_ + _dxl->dxl_state_->position_offset_ * offset_ratio_);
 
       uint8_t _sync_write_data[4];
       _sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(_pos_data));
@@ -1935,12 +1953,12 @@ void RobotisController::setJointCtrlModuleThread(robotis_controller_msgs::msg::J
       _sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(_pos_data));
       _sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(_pos_data));
 
-      if(port_to_sync_write_position_[_dxl->port_name_] != NULL)
+      if(port_to_sync_write_position_[_dxl->port_name_] != nullptr)
         port_to_sync_write_position_[_dxl->port_name_]->addParam(_dxl->id_, _sync_write_data);
 
-      if(port_to_sync_write_current_[_dxl->port_name_] != NULL)
+      if(port_to_sync_write_current_[_dxl->port_name_] != nullptr)
         port_to_sync_write_current_[_dxl->port_name_]->removeParam(_dxl->id_);
-      if(port_to_sync_write_velocity_[_dxl->port_name_] != NULL)
+      if(port_to_sync_write_velocity_[_dxl->port_name_] != nullptr)
         port_to_sync_write_velocity_[_dxl->port_name_]->removeParam(_dxl->id_);
     }
     else
@@ -1966,8 +1984,7 @@ void RobotisController::setJointCtrlModuleThread(robotis_controller_msgs::msg::J
 
           if(_mode == PositionControl)
           {
-            uint32_t _pos_data;
-            _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_ + _dxl->dxl_state_->position_offset_ * offset_ratio_);
+            uint32_t _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_ + _dxl->dxl_state_->position_offset_ * offset_ratio_);
 
             uint8_t _sync_write_data[4];
             _sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(_pos_data));
@@ -1975,12 +1992,12 @@ void RobotisController::setJointCtrlModuleThread(robotis_controller_msgs::msg::J
             _sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(_pos_data));
             _sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(_pos_data));
 
-            if(port_to_sync_write_position_[_dxl->port_name_] != NULL)
+            if(port_to_sync_write_position_[_dxl->port_name_] != nullptr)
               port_to_sync_write_position_[_dxl->port_name_]->addParam(_dxl->id_, _sync_write_data);
 
-            if(port_to_sync_write_current_[_dxl->port_name_] != NULL)
+            if(port_to_sync_write_current_[_dxl->port_name_] != nullptr)
               port_to_sync_write_current_[_dxl->port_name_]->removeParam(_dxl->id_);
-            if(port_to_sync_write_velocity_[_dxl->port_name_] != NULL)
+            if(port_to_sync_write_velocity_[_dxl->port_name_] != nullptr)
               port_to_sync_write_velocity_[_dxl->port_name_]->removeParam(_dxl->id_);
           }
           else if(_mode == VelocityControl)
@@ -1992,12 +2009,12 @@ void RobotisController::setJointCtrlModuleThread(robotis_controller_msgs::msg::J
             _sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(_vel_data));
             _sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(_vel_data));
 
-            if(port_to_sync_write_velocity_[_dxl->port_name_] != NULL)
+            if(port_to_sync_write_velocity_[_dxl->port_name_] != nullptr)
               port_to_sync_write_velocity_[_dxl->port_name_]->addParam(_dxl->id_, _sync_write_data);
 
-            if(port_to_sync_write_current_[_dxl->port_name_] != NULL)
+            if(port_to_sync_write_current_[_dxl->port_name_] != nullptr)
               port_to_sync_write_current_[_dxl->port_name_]->removeParam(_dxl->id_);
-            if(port_to_sync_write_position_[_dxl->port_name_] != NULL)
+            if(port_to_sync_write_position_[_dxl->port_name_] != nullptr)
               port_to_sync_write_position_[_dxl->port_name_]->removeParam(_dxl->id_);
           }
           else if(_mode == TorqueControl)
@@ -2009,12 +2026,12 @@ void RobotisController::setJointCtrlModuleThread(robotis_controller_msgs::msg::J
             _sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(_curr_data));
             _sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(_curr_data));
 
-            if(port_to_sync_write_current_[_dxl->port_name_] != NULL)
+            if(port_to_sync_write_current_[_dxl->port_name_] != nullptr)
               port_to_sync_write_current_[_dxl->port_name_]->addParam(_dxl->id_, _sync_write_data);
 
-            if(port_to_sync_write_velocity_[_dxl->port_name_] != NULL)
+            if(port_to_sync_write_velocity_[_dxl->port_name_] != nullptr)
               port_to_sync_write_velocity_[_dxl->port_name_]->removeParam(_dxl->id_);
-            if(port_to_sync_write_position_[_dxl->port_name_] != NULL)
+            if(port_to_sync_write_position_[_dxl->port_name_] != nullptr)
               port_to_sync_write_position_[_dxl->port_name_]->removeParam(_dxl->id_);
           }
           break;
